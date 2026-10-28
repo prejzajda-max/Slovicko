@@ -244,7 +244,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 
 /* Velké obrazovky: hra jako jeden blok uprostřed, větší dlaždice a klávesy, přehled vpravo */
 .stage { min-height: 100%; }
-.side { display: none; }
+.side, .side-left { display: none; }
 @media (min-width: 760px) and (min-height: 800px) {
   :root { --tile-scale: 1.35; }
   .stage { height: 100%; }
@@ -265,8 +265,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 }
 @media (min-width: 1180px) and (min-height: 800px) {
   .stage { display: grid; grid-template-columns: 1fr minmax(0, 560px) 1fr; column-gap: 40px; }
-  .stage > .app { grid-column: 2; width: 100%; }
-  .side { grid-column: 3; display: flex; flex-direction: column; gap: 18px; align-self: center; max-width: 290px; padding: 22px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
+  .stage > .app { grid-column: 2; grid-row: 1; width: 100%; }
+  .side-left { grid-column: 1; grid-row: 1; justify-self: end; align-self: center; display: flex; flex-direction: column; gap: 12px; width: 220px; }
+  .kb .key.wide { display: none; }
+  .side { grid-column: 3; grid-row: 1; display: flex; flex-direction: column; gap: 18px; align-self: center; max-width: 290px; padding: 22px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
 }
 .side h2 { font: var(--title-weight) 1.35rem/1.2 var(--title-font); margin: 0; }
 .side .sub { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
@@ -276,6 +278,13 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .side .legend { font-size: .88rem; gap: 6px; }
 .side .legend .tile { width: 28px; font-size: .95rem; --tile-scale: 1; }
 .side .primary { flex: none; }
+.bigbtn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 72px; border: 0; border-radius: 16px; cursor: pointer; font: 800 1.35rem var(--display); box-shadow: var(--key-shadow); }
+.bigbtn svg { width: 26px; height: 26px; }
+.bigbtn.go { background: var(--hit); color: var(--on-hit); }
+.bigbtn.del { background: var(--key); color: var(--key-ink); height: 60px; font-size: 1.15rem; }
+.bigbtn:active { transform: translateY(2px); box-shadow: none; }
+.bigbtn:disabled { opacity: .45; cursor: default; }
+.kbhint { margin: 2px 4px 0; color: var(--muted); font-size: .85rem; line-height: 1.4; text-align: center; }
 .side .mean { background: var(--bg); }
 .side .answer { font-size: 1.4rem; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
@@ -284,6 +293,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 </head>
 <body>
 <div class="stage">
+<aside class="side-left" aria-label="Ovládání">
+  <button class="bigbtn go" id="leftEnter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Hádat</button>
+  <button class="bigbtn del" id="leftDel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM18 9l-6 6M12 9l6 6"/></svg>Smazat</button>
+  <p class="kbhint">Na klávesnici počítače funguje i Enter a Backspace.</p>
+</aside>
 <div class="app">
   <header>
     <h1><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="7" width="34" height="31" rx="8" style="fill:var(--hit)"/><path d="M12 4 L19 10 L26 4" style="fill:none;stroke:var(--near);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round"/><text x="19" y="31" text-anchor="middle" style="font-family:var(--tile-font);font-weight:700;font-size:22px;fill:var(--on-hit)">S</text></svg><span>Slovíčko<span class="dot">.</span></span></h1>
@@ -895,6 +909,8 @@ setInterval(() => {
 }, 1000);
 wideMq.addEventListener ? wideMq.addEventListener('change', renderSide) : wideMq.addListener(renderSide);
 
+document.getElementById('leftEnter').onclick = e => { press('ENTER'); e.currentTarget.blur(); };
+document.getElementById('leftDel').onclick = e => { press('⌫'); e.currentTarget.blur(); };
 document.getElementById('tabDaily').onclick = () => startGame('daily', todayIndex());
 document.getElementById('tabTrain').onclick = () => startGame('train');
 document.getElementById('tabChal').onclick = showMakeChallenge;
