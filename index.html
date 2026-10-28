@@ -3,8 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Slovíčko</title>
-<meta name="description" content="Denní česká hra na hádání slov. Uhodni slovo o 5 písmenech na 6 pokusů.">
+<title>Slovíčko – česká hra na hádání slov (Wordle česky)</title>
+<meta name="description" content="Slovíčko je denní česká hra na hádání slov podobná Wordle. Uhodni české slovo o 5 písmenech na 6 pokusů. Hraj zdarma v prohlížeči, bez registrace.">
+<meta name="keywords" content="slovíčko, hra se slovy, hádání slov, wordle česky, česká wordle, slovní hra, slovo dne">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://prejzajda-max.github.io/Slovicko/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Slovíčko",
+  "alternateName": ["Slovíčko hra", "Wordle česky"],
+  "url": "https://prejzajda-max.github.io/Slovicko/",
+  "description": "Denní česká hra na hádání slov. Uhodni slovo o 5 písmenech na 6 pokusů.",
+  "applicationCategory": "GameApplication",
+  "genre": "Slovní hra",
+  "inLanguage": "cs",
+  "operatingSystem": "Libovolný prohlížeč",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CZK" },
+  "image": "https://prejzajda-max.github.io/Slovicko/og.png"
+}
+</script>
 <meta name="theme-color" content="#2f8f5b">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Slovíčko – uhodni dnešní slovo">
@@ -39,6 +59,7 @@
 }
 :root.cb { --hit: #e3742b; --near: #3d8fd6; }
 html, body { height: 100%; }
+html { background: var(--bg); }
 body {
   margin: 0; background: var(--bg); color: var(--ink); font: 15px var(--body);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
@@ -87,6 +108,9 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 @keyframes shake { 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
 @keyframes hop { 40% { transform: translateY(-14px); } }
 
+.about { max-width: 500px; margin: 0 auto; padding-block: 28px 32px; border-top: 1px solid var(--line); color: var(--muted); line-height: 1.55; }
+.about h2 { font: 800 1.15rem var(--display); color: var(--ink); margin: 0 0 8px; text-wrap: balance; }
+.about p { margin: 0 0 10px; max-width: 65ch; }
 .kb { display: flex; flex-direction: column; gap: 6px; user-select: none; }
 .kr { display: flex; gap: 4px; justify-content: center; }
 .key { flex: 1 1 0; min-width: 0; height: 50px; max-width: 44px; font: 700 1rem var(--body); color: var(--ink); background: var(--key); border: 0; border-radius: 6px; cursor: pointer; padding: 0; display: grid; place-items: center; }
@@ -184,6 +208,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
   <div class="board-wrap"><div class="board" id="board" aria-label="Hrací plocha"></div></div>
   <div class="kb" id="kb" aria-label="Klávesnice"></div>
 </div>
+
+<footer class="about">
+  <h2>Slovíčko: česká hra na hádání slov</h2>
+  <p>Slovíčko je česká obdoba populární hry Wordle. Každý den je připravené jedno nové slovo o pěti písmenech, stejné pro všechny hráče. Máš šest pokusů a po každém z nich barvy prozradí, která písmena ve slově jsou a jestli stojí na správném místě.</p>
+  <p>Hra počítá s háčky a čárkami, ale dá se hrát i bez diakritiky. Kromě slova dne nabízí trénink s náhodnými slovy, archiv starších slovíček, těžký režim a výzvy, ve kterých kamarádovi pošleš vlastní slovo k uhodnutí. Hraje se zdarma v prohlížeči na mobilu i počítači, bez registrace a bez reklam.</p>
+</footer>
 
 <div class="toast" id="toast" role="status" hidden></div>
 <div class="sheet-bg" id="sheetBg" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
