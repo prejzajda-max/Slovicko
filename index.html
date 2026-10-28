@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Slovíčko</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+body{margin:0}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* Layout: one centred column — header, 6×5 tile grid, Czech QWERTZ keyboard pinned under it */
+:root {
+  --bg: #eef0f3;
+  --surface: #ffffff;
+  --ink: #1d2433;
+  --muted: #6b7486;
+  --line: #c9ced8;
+  --key: #d8dce4;
+  --hit: #2f8f5b;
+  --near: #d69a1f;
+  --miss: #7b8394;
+  --on-state: #ffffff;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161f; --surface: #1b2130; --ink: #e8ebf1; --muted: #9099ab;
+    --line: #353d50; --key: #2c3446; --hit: #3a9d67; --near: #c99022; --miss: #444c5e;
+    --on-state: #ffffff; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161f; --surface: #1b2130; --ink: #e8ebf1; --muted: #9099ab;
+  --line: #353d50; --key: #2c3446; --hit: #3a9d67; --near: #c99022; --miss: #444c5e;
+  --on-state: #ffffff; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.app {
+  max-width: 500px; margin: 0 auto; min-height: 100%;
+  display: flex; flex-direction: column; gap: 14px; padding-block: 14px 12px;
+}
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+h1 {
+  font-family: var(--display); font-weight: 800; font-size: 1.9rem; margin: 0; letter-spacing: -0.02em;
+  display: flex; align-items: baseline; gap: 2px;
+}
+h1 .dot { color: var(--hit); }
+.sub { margin: 2px 0 0; color: var(--muted); font-size: 0.85rem; }
+.btns { display: flex; gap: 8px; }
+.ghost {
+  font: 700 0.85rem var(--body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer;
+}
+.ghost:hover { border-color: var(--muted); }
+button:focus-visible { outline: 3px solid var(--near); outline-offset: 2px; }
+
+.board-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+.board {
+  display: grid; grid-template-rows: repeat(6, 1fr); gap: 6px;
+  width: min(100%, 330px);
+}
+.row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.tile {
+  aspect-ratio: 1; max-width: 100%;
+  display: grid; place-items: center;
+  font: 800 1.9rem var(--display); text-transform: uppercase;
+  border: 2px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink);
+  user-select: none;
+}
+.tile.filled { border-color: var(--muted); animation: pop .1s ease-out; }
+.tile.hit  { background: var(--hit);  border-color: var(--hit);  color: var(--on-state); }
+.tile.near { background: var(--near); border-color: var(--near); color: var(--on-state); }
+.tile.miss { background: var(--miss); border-color: var(--miss); color: var(--on-state); }
+.tile.flip { animation: flip .45s ease-in-out both; }
+.row.shake { animation: shake .4s; }
+.tile.win { animation: hop .5s ease both; }
+@keyframes pop { 50% { transform: scale(1.08); } }
+@keyframes flip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+@keyframes shake { 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
+@keyframes hop { 40% { transform: translateY(-14px); } 100% { transform: translateY(0); } }
+
+.kb { display: flex; flex-direction: column; gap: 6px; user-select: none; }
+.kr { display: flex; gap: 4px; justify-content: center; }
+.key {
+  flex: 1 1 0; min-width: 0; height: 50px; max-width: 44px;
+  font: 700 1rem var(--body); color: var(--ink); background: var(--key);
+  border: 0; border-radius: 6px; cursor: pointer; padding: 0;
+  display: grid; place-items: center;
+}
+.key.wide { max-width: 68px; flex-grow: 1.6; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.key.diac { height: 40px; }
+.key.hit  { background: var(--hit);  color: var(--on-state); }
+.key.near { background: var(--near); color: var(--on-state); }
+.key.miss { background: var(--miss); color: var(--on-state); opacity: .75; }
+.key:active { transform: translateY(1px); }
+
+.toast {
+  position: fixed; left: 50%; top: calc(80px + env(safe-area-inset-top, 0px)); transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); font-weight: 700; padding: 10px 16px; border-radius: 8px;
+  z-index: 20; pointer-events: none; max-width: calc(100% - 32px); text-align: center;
+}
+
+.sheet-bg {
+  position: fixed; inset: 0; background: rgba(10, 14, 22, .55); z-index: 30;
+  display: grid; place-items: center; padding: 16px;
+}
+.sheet {
+  background: var(--surface); color: var(--ink); border-radius: 14px; padding: 22px;
+  width: min(100%, 380px); display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.3);
+}
+.sheet h2 { font: 800 1.5rem var(--display); margin: 0; text-wrap: balance; }
+.sheet p { margin: 0; line-height: 1.5; color: var(--muted); }
+.answer { font: 800 1.6rem var(--display); letter-spacing: .12em; color: var(--ink); }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+.stats b { display: block; font: 800 1.6rem var(--display); font-variant-numeric: tabular-nums; }
+.stats span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.dist { display: flex; flex-direction: column; gap: 4px; }
+.bar { display: grid; grid-template-columns: 14px 1fr; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; font-size: .85rem; }
+.bar i { display: block; background: var(--miss); color: var(--on-state); font-style: normal; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-align: right; min-width: 22px; }
+.bar i.now { background: var(--hit); }
+.primary {
+  font: 700 1rem var(--body); background: var(--hit); color: var(--on-state); border: 0;
+  border-radius: 10px; padding: 12px; cursor: pointer;
+}
+.legend { display: flex; flex-direction: column; gap: 8px; }
+.legend div { display: flex; align-items: center; gap: 10px; color: var(--ink); }
+.legend .tile { width: 34px; font-size: 1.1rem; flex: none; }
+
+@media (max-height: 640px) { .key { height: 44px; } .key.diac { height: 34px; } .tile { font-size: 1.5rem; } .board { width: min(100%, 270px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div>
+      <h1>Slovíčko<span class="dot">.</span></h1>
+      <p class="sub">Uhodni české slovo o 5 písmenech na 6 pokusů</p>
+    </div>
+    <div class="btns">
+      <button class="ghost" id="helpBtn" aria-label="Jak hrát">?</button>
+      <button class="ghost" id="statsBtn">Skóre</button>
+    </div>
+  </header>
+
+  <div class="board-wrap"><div class="board" id="board" aria-label="Hrací plocha"></div></div>
+
+  <div class="kb" id="kb" aria-label="Klávesnice"></div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<div class="sheet-bg" id="sheetBg" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+const RAW = `kniha strom skála louka hrnek kočka myška vesna zámek hrady město mrkev houba chléb máslo mléko pivko vínko židle lampa dveře tráva květy lilie barva hudba píseň bubny opera balet fotka obraz socha malíř slovo dopis psaní pošta banka mince cesta tunel vlaky motor brzda kufry měsíc mraky bouře kámen písek hlína potok kopec údolí liška zajíc srnka jelen kráva prase koník labuť vrána holub včela motýl štika opice zebra krtek ježek hlava prsty srdce vlasy loket palec skříň stěna schody sklep garáž brána klíče budík talíř lžíce nůžky hrnec pánev trouba guláš řízek salát těsto koláč buchta pizza rajče malina ořech sirup láska smích chyba nápad šance život domov vlast národ jazyk škola třída lekce tužka sešit křída míček hokej tenis šachy karty matka bratr holka strýc princ čert anděl rytíř pirát lékař hasič pekař herec večer týden kabát šátek sukně svetr bunda okurky mušle perla zlato stříbro trpaslík hřeben zrcadlo mýdlo ručník vločka kometa planeta raketa robot počítač myšák kuchař zelí sýrař čajník hrách fazole`;
+const WORDS = [...new Set(RAW.split(/\s+/).map(w => w.toLocaleUpperCase('cs')).filter(w => [...w].length === 5))];
+
+const ROWS = 6, LEN = 5;
+const KB = [
+  ['Ě','Š','Č','Ř','Ž','Ý','Á','Í','É','Ú'],
+  ['Q','W','E','R','T','Z','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L','Ů','Ó'],
+  ['ENTER','Y','X','C','V','B','N','M','Ď','Ť','Ň','⌫']
+];
+const LETTER = /^[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]$/;
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+let stats = store.get('slovicko-stats', { played: 0, won: 0, streak: 0, best: 0, dist: [0,0,0,0,0,0] });
+
+let answer, guesses, current, over, busy, lastWinRow = -1;
+const boardEl = document.getElementById('board'), kbEl = document.getElementById('kb');
+
+function buildBoard() {
+  boardEl.innerHTML = '';
+  for (let r = 0; r < ROWS; r++) {
+    const row = document.createElement('div'); row.className = 'row';
+    for (let c = 0; c < LEN; c++) { const t = document.createElement('div'); t.className = 'tile'; row.appendChild(t); }
+    boardEl.appendChild(row);
+  }
+}
+function buildKb() {
+  kbEl.innerHTML = '';
+  KB.forEach((r, i) => {
+    const row = document.createElement('div'); row.className = 'kr';
+    r.forEach(k => {
+      const b = document.createElement('button'); b.className = 'key';
+      if (i === 0) b.classList.add('diac');
+      if (k === 'ENTER' || k === '⌫') b.classList.add('wide');
+      b.textContent = k === 'ENTER' ? 'Hádat' : k;
+      if (k === '⌫') b.setAttribute('aria-label', 'Smazat');
+      b.dataset.k = k; row.appendChild(b);
+    });
+    kbEl.appendChild(row);
+  });
+}
+kbEl.addEventListener('click', e => { const b = e.target.closest('.key'); if (b) { press(b.dataset.k); b.blur(); } });
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (!document.getElementById('sheetBg').hidden) { if (e.key === 'Escape' || e.key === 'Enter') closeSheet(); return; }
+  if (e.key === 'Enter') { e.preventDefault(); press('ENTER'); }
+  else if (e.key === 'Backspace') press('⌫');
+  else { const k = e.key.toLocaleUpperCase('cs'); if (LETTER.test(k)) press(k); }
+});
+
+function newGame() {
+  let pick; do { pick = WORDS[Math.floor(Math.random() * WORDS.length)]; } while (WORDS.length > 1 && pick === answer);
+  answer = pick; guesses = []; current = []; over = false; busy = false;
+  buildBoard(); buildKb();
+}
+function rowEl(r) { return boardEl.children[r]; }
+function paintCurrent() {
+  const tiles = rowEl(guesses.length).children;
+  for (let i = 0; i < LEN; i++) { tiles[i].textContent = current[i] || ''; tiles[i].classList.toggle('filled', !!current[i]); }
+}
+function press(k) {
+  if (over || busy) return;
+  if (k === '⌫') { current.pop(); paintCurrent(); return; }
+  if (k === 'ENTER') { submit(); return; }
+  if (current.length < LEN) { current.push(k); paintCurrent(); }
+}
+function score(guess, target) {
+  const res = Array(LEN).fill('miss'), left = {};
+  for (let i = 0; i < LEN; i++) { if (guess[i] === target[i]) res[i] = 'hit'; else left[target[i]] = (left[target[i]] || 0) + 1; }
+  for (let i = 0; i < LEN; i++) { if (res[i] !== 'hit' && left[guess[i]]) { res[i] = 'near'; left[guess[i]]--; } }
+  return res;
+}
+const RANK = { miss: 1, near: 2, hit: 3 };
+function submit() {
+  const r = guesses.length;
+  if (current.length < LEN) { toast('Slovo musí mít 5 písmen'); shake(r); return; }
+  const target = [...answer], res = score(current, target);
+  const tiles = rowEl(r).children, word = current.slice();
+  busy = true;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, step = reduce ? 0 : 260;
+  word.forEach((ch, i) => setTimeout(() => {
+    tiles[i].classList.add('flip');
+    setTimeout(() => { tiles[i].classList.add(res[i]); }, reduce ? 0 : 220);
+  }, i * step));
+  setTimeout(() => {
+    word.forEach((ch, i) => {
+      const key = kbEl.querySelector(`[data-k="${ch}"]`); if (!key) return;
+      const prev = ['hit','near','miss'].find(c => key.classList.contains(c));
+      if (!prev || RANK[res[i]] > RANK[prev]) { key.classList.remove('hit','near','miss'); key.classList.add(res[i]); }
+    });
+    guesses.push(word); current = []; busy = false;
+    const won = res.every(x => x === 'hit');
+    if (won) finish(true, r);
+    else if (guesses.length === ROWS) finish(false, r);
+  }, LEN * step + (reduce ? 0 : 250));
+}
+function finish(won, r) {
+  over = true;
+  stats.played++;
+  if (won) { stats.won++; stats.streak++; stats.best = Math.max(stats.best, stats.streak); stats.dist[r]++; lastWinRow = r; }
+  else { stats.streak = 0; lastWinRow = -1; }
+  store.set('slovicko-stats', stats);
+  if (won) {
+    [...rowEl(r).children].forEach((t, i) => { t.style.animationDelay = (i * 90) + 'ms'; t.classList.remove('flip'); void t.offsetWidth; t.classList.add('win'); });
+    toast(['Génius!','Skvělé!','Výborně!','Pěkně!','Uf, dobrý!','Na poslední chvíli!'][r]);
+  }
+  setTimeout(() => showStats(won ? 'win' : 'lose'), 1300);
+}
+function shake(r) { const el = rowEl(r); el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 1600);
+}
+
+const sheetBg = document.getElementById('sheetBg'), sheet = document.getElementById('sheet');
+function openSheet(html) { sheet.innerHTML = html; sheetBg.hidden = false; const b = sheet.querySelector('button'); b && b.focus(); }
+function closeSheet() { sheetBg.hidden = true; }
+sheetBg.addEventListener('click', e => { if (e.target === sheetBg) closeSheet(); });
+
+function showStats(mode) {
+  const pct = stats.played ? Math.round(stats.won / stats.played * 100) : 0;
+  const max = Math.max(1, ...stats.dist);
+  const head = mode === 'win' ? `<h2>Uhodnuto na ${guesses.length}. pokus</h2><div class="answer">${answer}</div>`
+    : mode === 'lose' ? `<h2>Tentokrát to nevyšlo</h2><p>Hledané slovo bylo</p><div class="answer">${answer}</div>`
+    : `<h2>Tvoje skóre</h2>`;
+  const bars = stats.dist.map((n, i) => `<div class="bar"><span>${i+1}</span><i class="${mode==='win' && i===lastWinRow ? 'now' : ''}" style="width:${Math.max(8, n/max*100)}%">${n}</i></div>`).join('');
+  openSheet(`${head}
+    <div class="stats">
+      <div><b>${stats.played}</b><span>Her</span></div>
+      <div><b>${pct}%</b><span>Výher</span></div>
+      <div><b>${stats.streak}</b><span>Série</span></div>
+      <div><b>${stats.best}</b><span>Nejlepší</span></div>
+    </div>
+    <div class="dist">${bars}</div>
+    <button class="primary" id="again">${over ? 'Nové slovo' : 'Hrát dál'}</button>`);
+  document.getElementById('again').onclick = () => { closeSheet(); if (over) newGame(); };
+}
+function showHelp() {
+  openSheet(`<h2>Jak hrát</h2>
+    <p>Napiš libovolné slovo o 5 písmenech a potvrď tlačítkem Hádat. Háčky a čárky se počítají jako samostatná písmena, takže E a Ě nejsou totéž.</p>
+    <div class="legend">
+      <div><span class="tile hit">K</span> písmeno je ve slově na správném místě</div>
+      <div><span class="tile near">O</span> písmeno ve slově je, ale jinde</div>
+      <div><span class="tile miss">Z</span> písmeno ve slově není</div>
+    </div>
+    <p>Hledaná slova jsou běžná podstatná jména v 1. pádě.</p>
+    <button class="primary" id="ok">Jdu hrát</button>`);
+  document.getElementById('ok').onclick = closeSheet;
+}
+document.getElementById('statsBtn').onclick = () => showStats('view');
+document.getElementById('helpBtn').onclick = showHelp;
+
+newGame();
+if (!store.get('slovicko-seen', false)) { store.set('slovicko-seen', true); setTimeout(showHelp, 300); }
+</script>
+</body>
+</html>
