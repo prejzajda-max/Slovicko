@@ -44,25 +44,72 @@
 <meta name="apple-mobile-web-app-title" content="Slovíčko">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=Caveat:wght@600;700&family=Zilla+Slab:wght@600;700&family=Patrick+Hand&family=Fredoka:wght@500;700&display=swap">
 <style>
-/* Layout: one centred column — header, mode tabs, 6×5 tile grid, Czech QWERTZ keyboard under it */
+/* Layout: one centred column — header, mode tabs, 6×5 tile grid, Czech QWERTZ keyboard under it.
+   Vzhledy (skins) only redefine tokens; components read tokens. Klasický follows the system theme, the others commit to one look. */
 :root {
-  --bg: #eef0f3; --surface: #ffffff; --ink: #1d2433; --muted: #6b7486; --line: #c9ced8; --key: #d8dce4;
-  --hit: #2f8f5b; --near: #d69a1f; --miss: #7b8394; --on-state: #ffffff;
+  --bg: #eef0f3; --page: none; --surface: #ffffff; --ink: #1d2433; --muted: #6b7486; --line: #c9ced8;
+  --key: #d8dce4; --key-ink: var(--ink); --key-shadow: none; --key-radius: 6px;
+  --hit: #2f8f5b; --near: #d69a1f; --miss: #7b8394; --on-hit: #ffffff; --on-near: #ffffff; --on-miss: #ffffff;
+  --tile-bg: var(--surface); --tile-line: var(--line); --tile-filled: var(--muted); --tile-style: solid; --tile-radius: 6px;
+  --tile-shadow: none; --state-shadow: none; --tile-glow: none;
+  --tile-font: var(--display); --tile-weight: 800; --tile-size: 1.85rem;
+  --title-font: var(--display); --title-weight: 800; --title-size: 1.75rem; --accent: var(--hit);
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #12161f; --surface: #1b2130; --ink: #e8ebf1; --muted: #9099ab; --line: #353d50; --key: #2c3446;
+  :root:not([data-skin]) { --bg: #12161f; --surface: #1b2130; --ink: #e8ebf1; --muted: #9099ab; --line: #353d50; --key: #2c3446;
           --hit: #3a9d67; --near: #c99022; --miss: #444c5e; color-scheme: dark; }
 }
-:root.cb { --hit: #e3742b; --near: #3d8fd6; }
+/* Školní sešit: linkovaný papír, modrý inkoust, zvýrazňovače */
+:root[data-skin="sesit"] {
+  --bg: #fbf8ef; --page: linear-gradient(90deg, transparent 9px, #eaa6a2 9px 11px, transparent 11px), repeating-linear-gradient(180deg, transparent 0 27px, #cfdcf0 27px 28px);
+  --surface: #fffdf7; --ink: #1f2f6b; --muted: #5d6b94; --line: #b9c7e2; --key: #efe8d6; --key-shadow: 0 2px 0 #d3c7a6; --key-radius: 4px;
+  --hit: #8fdc9b; --near: #ffe169; --miss: #ddd8cb; --on-hit: #1f2f6b; --on-near: #1f2f6b; --on-miss: #6b7090;
+  --tile-bg: rgba(255,255,255,.65); --tile-line: #a9bde0; --tile-filled: #1f2f6b; --tile-radius: 3px;
+  --tile-font: "Caveat", "Segoe Print", cursive; --tile-weight: 700; --tile-size: 2.5rem;
+  --title-font: "Caveat", "Segoe Print", cursive; --title-weight: 700; --title-size: 2.4rem; --accent: #d9534f;
+}
+/* Česká klasika: krémový papír, dřevěné kostky, slabé zrno */
+:root[data-skin="klasika"] {
+  --bg: #f1e6d0; --page: radial-gradient(rgba(110,70,30,.07) 1px, transparent 1.4px) 0 0 / 5px 5px;
+  --surface: #fbf5e8; --ink: #3b2616; --muted: #7d6450; --line: #d8c5a3; --key: #e8d6b5; --key-shadow: 0 3px 0 #b8996b; --key-radius: 8px;
+  --hit: #4f7f3a; --near: #d39b2a; --miss: #8c7b67; --on-hit: #fff8ec; --on-near: #fff8ec; --on-miss: #fff8ec;
+  --tile-bg: linear-gradient(160deg, #f3ddb5, #dcb682); --tile-line: transparent; --tile-filled: #a77b48; --tile-radius: 8px;
+  --tile-shadow: 0 4px 0 #a8794a, inset 0 1px 0 rgba(255,255,255,.55); --state-shadow: 0 4px 0 rgba(60,35,15,.35);
+  --tile-font: "Zilla Slab", Georgia, serif; --tile-weight: 700; --tile-size: 2rem;
+  --title-font: "Zilla Slab", Georgia, serif; --title-weight: 700; --title-size: 1.9rem; --accent: #b8352c;
+}
+/* Noční tabule: zelená tabule, křída, dřevěný rám */
+:root[data-skin="tabule"] {
+  --bg: #1e3a2c; --page: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.07), transparent 55%), radial-gradient(ellipse at 80% 85%, rgba(255,255,255,.05), transparent 50%);
+  --surface: #26473a; --ink: #f2f1ea; --muted: #a9bfb2; --line: rgba(242,241,234,.28); --key: rgba(242,241,234,.1); --key-radius: 5px;
+  --hit: #7ccf86; --near: #f0cf5e; --miss: rgba(242,241,234,.16); --on-hit: #13261c; --on-near: #13261c; --on-miss: #e6e5dc;
+  --tile-bg: transparent; --tile-line: rgba(242,241,234,.38); --tile-filled: #f2f1ea; --tile-style: dashed; --tile-radius: 4px;
+  --tile-glow: 0 0 2px rgba(255,255,255,.55);
+  --tile-font: "Patrick Hand", "Comic Sans MS", cursive; --tile-weight: 400; --tile-size: 2.3rem;
+  --title-font: "Patrick Hand", "Comic Sans MS", cursive; --title-weight: 400; --title-size: 2.1rem; --accent: #f0cf5e;
+  color-scheme: dark;
+}
+/* Moderní: sytě modrá noc, zaoblené 3D dlaždice */
+:root[data-skin="moderni"] {
+  --bg: #121735; --page: radial-gradient(circle at 15% 0%, #2b3176 0, transparent 45%), radial-gradient(circle at 100% 100%, #0e3f50 0, transparent 45%);
+  --surface: #1d2350; --ink: #f4f6ff; --muted: #9aa3d4; --line: #343c78; --key: #2b3271; --key-shadow: 0 4px 0 #161b45; --key-radius: 10px;
+  --hit: #22c47a; --near: #ffb21e; --miss: #464e88; --on-hit: #ffffff; --on-near: #2a1c00; --on-miss: #ffffff;
+  --tile-bg: #20275a; --tile-line: transparent; --tile-filled: #6b74c9; --tile-radius: 14px;
+  --tile-shadow: inset 0 -5px 0 rgba(0,0,0,.28); --state-shadow: inset 0 -5px 0 rgba(0,0,0,.22);
+  --tile-font: "Fredoka", "Segoe UI", sans-serif; --tile-weight: 700; --tile-size: 2rem;
+  --title-font: "Fredoka", "Segoe UI", sans-serif; --title-weight: 700; --title-size: 1.85rem; --accent: #ffb21e;
+  color-scheme: dark;
+}
+:root.cb { --hit: #e3742b; --near: #3d8fd6; --on-hit: #ffffff; --on-near: #ffffff; }
 html, body { height: 100%; }
 html { background: var(--bg); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink); font: 15px var(--body);
+  margin: 0; background: var(--page), var(--bg); background-color: var(--bg); background-attachment: fixed; color: var(--ink); font: 15px var(--body);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
   box-sizing: border-box; -webkit-tap-highlight-color: transparent;
@@ -70,8 +117,10 @@ body {
 [hidden] { display: none !important; }
 .app { max-width: 500px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; gap: 12px; padding-block: 12px 12px; box-sizing: border-box; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-h1 { font: 800 1.75rem var(--display); margin: 0; letter-spacing: -0.02em; }
-h1 .dot { color: var(--hit); }
+h1 { font: var(--title-weight) var(--title-size)/1 var(--title-font); margin: 0; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
+h1 .dot { color: var(--accent); }
+h1 .mark { width: 30px; height: 30px; flex: none; }
+:root[data-skin="tabule"] body::after { content: ""; position: fixed; inset: 0; border: 7px solid #7a5532; box-shadow: inset 0 0 0 2px #5c3e22, inset 0 0 40px rgba(0,0,0,.35); pointer-events: none; z-index: 5; }
 .icons { display: flex; gap: 6px; }
 .ib {
   width: 38px; height: 38px; display: grid; place-items: center; padding: 0;
@@ -96,11 +145,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .board-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
 .board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 6px; width: min(100%, 320px); }
 .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-.tile { aspect-ratio: 1; max-width: 100%; display: grid; place-items: center; font: 800 1.85rem var(--display); border: 2px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); user-select: none; box-sizing: border-box; }
-.tile.filled { border-color: var(--muted); animation: pop .1s ease-out; }
-.tile.hit  { background: var(--hit);  border-color: var(--hit);  color: var(--on-state); }
-.tile.near { background: var(--near); border-color: var(--near); color: var(--on-state); }
-.tile.miss { background: var(--miss); border-color: var(--miss); color: var(--on-state); }
+.tile { aspect-ratio: 1; max-width: 100%; display: grid; place-items: center; font: var(--tile-weight) var(--tile-size)/1 var(--tile-font); border: 2px var(--tile-style) var(--tile-line); border-radius: var(--tile-radius); background: var(--tile-bg); box-shadow: var(--tile-shadow); text-shadow: var(--tile-glow); color: var(--ink); user-select: none; box-sizing: border-box; }
+.tile.filled { border-color: var(--tile-filled); animation: pop .1s ease-out; }
+.tile.hit  { background: var(--hit);  border: 2px solid var(--hit);  color: var(--on-hit);  box-shadow: var(--state-shadow); text-shadow: none; }
+.tile.near { background: var(--near); border: 2px solid var(--near); color: var(--on-near); box-shadow: var(--state-shadow); text-shadow: none; }
+.tile.miss { background: var(--miss); border: 2px solid transparent; color: var(--on-miss); box-shadow: var(--state-shadow); text-shadow: none; }
 .tile.flip { animation: flip .45s ease-in-out both; }
 .row.shake { animation: shake .4s; }
 .tile.win { animation: hop .5s ease both; }
@@ -114,21 +163,21 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .about p { margin: 0 0 10px; max-width: 65ch; }
 .kb { display: flex; flex-direction: column; gap: 6px; user-select: none; }
 .kr { display: flex; gap: 4px; justify-content: center; }
-.key { flex: 1 1 0; min-width: 0; height: 50px; max-width: 44px; font: 700 1rem var(--body); color: var(--ink); background: var(--key); border: 0; border-radius: 6px; cursor: pointer; padding: 0; display: grid; place-items: center; }
+.key { flex: 1 1 0; min-width: 0; height: 50px; max-width: 44px; font: 700 1rem var(--body); color: var(--key-ink); background: var(--key); box-shadow: var(--key-shadow); border: 0; border-radius: var(--key-radius); cursor: pointer; padding: 0; display: grid; place-items: center; }
 .key.wide { max-width: 68px; flex-grow: 1.6; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
 .key.diac { height: 40px; }
-.key.hit  { background: var(--hit);  color: var(--on-state); }
-.key.near { background: var(--near); color: var(--on-state); }
-.key.miss { background: var(--miss); color: var(--on-state); opacity: .75; }
-.key:active { transform: translateY(1px); }
+.key.hit  { background: var(--hit);  color: var(--on-hit); }
+.key.near { background: var(--near); color: var(--on-near); }
+.key.miss { background: var(--miss); color: var(--on-miss); opacity: .7; }
+.key:active { transform: translateY(2px); box-shadow: none; }
 
 .toast { position: fixed; left: 50%; top: calc(150px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); font-weight: 700; padding: 10px 16px; border-radius: 8px; z-index: 40; pointer-events: none; max-width: calc(100% - 32px); text-align: center; box-sizing: border-box; }
 
 .sheet-bg { position: fixed; inset: 0; background: rgba(10, 14, 22, .55); z-index: 30; display: grid; place-items: center; padding: 16px; }
 .sheet { background: var(--surface); color: var(--ink); border-radius: 14px; padding: 22px; width: min(100%, 400px); max-height: calc(100vh - 40px); overflow: auto; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 50px rgba(0,0,0,.3); box-sizing: border-box; }
-.sheet h2 { font: 800 1.5rem var(--display); margin: 0; text-wrap: balance; }
+.sheet h2 { font: var(--title-weight) 1.5rem var(--title-font); margin: 0; text-wrap: balance; }
 .sheet p { margin: 0; line-height: 1.5; color: var(--muted); }
-.answer { font: 800 1.6rem var(--display); letter-spacing: .12em; }
+.answer { font: var(--tile-weight) 1.7rem var(--tile-font); letter-spacing: .12em; }
 .mean { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 10px; background: var(--bg); }
 .sheet .mean .def { color: var(--ink); font-size: 1rem; }
 .refs { font-size: .82rem; color: var(--muted); }
@@ -144,10 +193,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .stats span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 .dist { display: flex; flex-direction: column; gap: 4px; }
 .bar { display: grid; grid-template-columns: 14px 1fr; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; font-size: .85rem; }
-.bar i { display: block; background: var(--miss); color: var(--on-state); font-style: normal; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-align: right; min-width: 22px; box-sizing: border-box; }
-.bar i.now { background: var(--hit); }
+.bar i { display: block; background: var(--miss); color: var(--on-miss); font-style: normal; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-align: right; min-width: 22px; box-sizing: border-box; }
+.bar i.now { background: var(--hit); color: var(--on-hit); }
 .primary, .secondary { flex: 1; font: 700 1rem var(--body); border: 0; border-radius: 10px; padding: 12px; cursor: pointer; }
-.primary { background: var(--hit); color: var(--on-state); }
+.primary { background: var(--hit); color: var(--on-hit); }
 .secondary { background: var(--key); color: var(--ink); }
 .row-btns { display: flex; gap: 8px; }
 .countdown { text-align: center; color: var(--muted); font-size: 0.9rem; }
@@ -166,13 +215,21 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .sw:checked { background: var(--hit); }
 .sw:checked::after { transform: translateX(18px); }
 .sw:disabled { opacity: .45; cursor: not-allowed; }
+.skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.skin { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding: 10px; border-radius: 12px; border: 2px solid var(--line); background: none; color: var(--ink); cursor: pointer; text-align: left; font: 700 .9rem var(--body); }
+.skin:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.skin[aria-pressed="true"] { border-color: var(--hit); box-shadow: 0 0 0 2px var(--hit); }
+.skin .pv { display: flex; gap: 4px; padding: 8px; border-radius: 8px; width: 100%; box-sizing: border-box; justify-content: center; }
+.skin .pv i { width: 24px; height: 24px; display: grid; place-items: center; font-style: normal; font-size: 15px; font-weight: 700; border-radius: 4px; }
+.sheet h3 { margin: 4px 0 -4px; font: 700 .78rem var(--body); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 45; }
 
 .arch { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 6px; }
 .day { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px; border-radius: 8px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; font: 800 1.05rem var(--display); }
 .day small { font: 400 .68rem var(--body); color: var(--muted); }
-.day.won { background: var(--hit); border-color: var(--hit); color: var(--on-state); }
-.day.lost { background: var(--miss); border-color: var(--miss); color: var(--on-state); }
-.day.won small, .day.lost small { color: var(--on-state); opacity: .85; }
+.day.won { background: var(--hit); border-color: var(--hit); color: var(--on-hit); }
+.day.lost { background: var(--miss); border-color: var(--miss); color: var(--on-miss); }
+.day.won small, .day.lost small { color: inherit; opacity: .85; }
 .day.part { border-color: var(--near); }
 .day.today { outline: 2px dashed var(--muted); outline-offset: 2px; }
 
@@ -183,7 +240,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 <body>
 <div class="app">
   <header>
-    <h1>Slovíčko<span class="dot">.</span></h1>
+    <h1><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="7" width="34" height="31" rx="8" style="fill:var(--hit)"/><path d="M12 4 L19 10 L26 4" style="fill:none;stroke:var(--near);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round"/><text x="19" y="31" text-anchor="middle" style="font-family:var(--tile-font);font-weight:700;font-size:22px;fill:var(--on-hit)">S</text></svg><span>Slovíčko<span class="dot">.</span></span></h1>
     <div class="icons">
       <button class="ib" id="helpBtn" aria-label="Jak hrát">?</button>
       <button class="ib" id="archBtn" aria-label="Archiv">
@@ -248,7 +305,7 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 };
-let settings = Object.assign({ easy: false, hard: false, cb: false, sound: true }, store.get('slovicko-nastaveni', {}));
+let settings = Object.assign({ easy: false, hard: false, cb: false, sound: true, skin: 'klasicky' }, store.get('slovicko-nastaveni', {}));
 let stats = store.get('slovicko-stats-v2', { played: 0, won: 0, streak: 0, best: 0, dist: [0,0,0,0,0,0], lastDay: null, lastWonDay: null });
 let games = store.get('slovicko-hry', {});
 (() => { const old = store.get('slovicko-den', null); if (old && !games[old.day]) { games[old.day] = { g: old.guesses }; store.set('slovicko-hry', games); } })();
@@ -259,6 +316,48 @@ function dateFor(day) { const d = new Date(EPOCH + day * 864e5); return `${d.get
 function applyCb() { document.documentElement.classList.toggle('cb', settings.cb); }
 applyCb();
 
+
+// ---------- vzhledy ----------
+const SKINS = [
+  { id: 'klasicky', name: 'Klasický', bg: '#eef0f3', tile: '#ffffff', ink: '#1d2433', hit: '#2f8f5b', near: '#d69a1f', miss: '#7b8394', on: '#fff', font: "'Bricolage Grotesque', sans-serif", theme: '#2f8f5b' },
+  { id: 'sesit', name: 'Školní sešit', bg: 'repeating-linear-gradient(180deg,#fbf8ef 0 11px,#cfdcf0 11px 12px)', tile: '#fffdf7', ink: '#1f2f6b', hit: '#8fdc9b', near: '#ffe169', miss: '#ddd8cb', on: '#1f2f6b', font: 'Caveat, cursive', theme: '#fbf8ef' },
+  { id: 'klasika', name: 'Česká klasika', bg: '#f1e6d0', tile: '#e8c997', ink: '#3b2616', hit: '#4f7f3a', near: '#d39b2a', miss: '#8c7b67', on: '#fff8ec', font: "'Zilla Slab', serif", theme: '#b8352c' },
+  { id: 'tabule', name: 'Noční tabule', bg: '#1e3a2c', tile: 'transparent', ink: '#f2f1ea', hit: '#7ccf86', near: '#f0cf5e', miss: 'rgba(242,241,234,.18)', on: '#13261c', font: "'Patrick Hand', cursive", theme: '#1e3a2c' },
+  { id: 'moderni', name: 'Moderní', bg: '#121735', tile: '#20275a', ink: '#f4f6ff', hit: '#22c47a', near: '#ffb21e', miss: '#464e88', on: '#fff', font: 'Fredoka, sans-serif', theme: '#121735' }
+];
+function applySkin() {
+  const s = SKINS.find(x => x.id === settings.skin) || SKINS[0];
+  if (s.id === 'klasicky') document.documentElement.removeAttribute('data-skin');
+  else document.documentElement.setAttribute('data-skin', s.id);
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = s.theme;
+}
+applySkin();
+
+// ---------- konfety ----------
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.createElement('canvas'); cv.id = 'confetti'; document.body.appendChild(cv);
+  const ctx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ['--hit', '--near', '--accent', '--tile-filled'].map(v => cs.getPropertyValue(v).trim()).filter(Boolean);
+  const parts = Array.from({ length: 140 }, (_, i) => ({
+    x: W / 2 + (Math.random() - .5) * W * .3, y: H * .35 + (Math.random() - .5) * 40 * dpr,
+    vx: (Math.random() - .5) * 16 * dpr, vy: (-Math.random() * 15 - 6) * dpr,
+    w: (5 + Math.random() * 6) * dpr, h: (8 + Math.random() * 8) * dpr,
+    r: Math.random() * 6.28, vr: (Math.random() - .5) * .35, c: cols[i % cols.length]
+  }));
+  const t0 = performance.now();
+  (function frame(t) {
+    const age = t - t0; ctx.clearRect(0, 0, W, H);
+    for (const p of parts) {
+      p.vy += .45 * dpr; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.globalAlpha = Math.max(0, 1 - age / 2600);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 1.7)) + 1); ctx.restore();
+    }
+    if (age < 2600) requestAnimationFrame(frame); else cv.remove();
+  })(t0);
+}
 // ---------- zvuk a vibrace ----------
 let actx;
 function tone(freq, dur = 0.06, type = 'sine', vol = 0.05, delay = 0) {
@@ -474,7 +573,7 @@ function finish(r) {
   }
   if (g.won) {
     [...rowEl(r).children].forEach((t, i) => { t.style.animationDelay = (i * 90) + 'ms'; t.classList.remove('flip'); void t.offsetWidth; t.classList.add('win'); });
-    toast(['Génius!','Skvělé!','Výborně!','Pěkně!','Uf, dobrý!','Na poslední chvíli!'][r]); sfx.win();
+    toast(['Génius!','Skvělé!','Výborně!','Pěkně!','Uf, dobrý!','Na poslední chvíli!'][r]); sfx.win(); setTimeout(confetti, 350);
   } else sfx.lose();
   updateStatus();
   setTimeout(() => { if (game === g) showEnd(); }, 1300);
@@ -666,7 +765,12 @@ function showArchive() {
 function showSettings() {
   const locked = game.guesses.length > 0 && !game.over;
   const row = (id, title, desc, checked, dis) => `<label class="opt" for="${id}"><span><strong>${title}</strong><small>${desc}</small></span><input type="checkbox" class="sw" id="${id}" ${checked ? 'checked' : ''} ${dis ? 'disabled' : ''}></label>`;
+  const skinBtns = SKINS.map(s => `<button class="skin" data-skin="${s.id}" aria-pressed="${s.id === settings.skin}">
+      <span class="pv" style="background:${s.bg}"><i style="background:${s.hit};color:${s.on};font-family:${s.font}">S</i><i style="background:${s.near};color:${s.on};font-family:${s.font}">L</i><i style="background:${s.miss};color:${s.on};font-family:${s.font}">O</i><i style="background:${s.tile};color:${s.ink};font-family:${s.font};outline:1px solid ${s.ink}33">V</i></span>${s.name}</button>`).join('');
   openSheet(`<h2>Nastavení</h2>
+    <h3>Vzhled</h3>
+    <div class="skins" id="skins">${skinBtns}</div>
+    <h3>Hra</h3>
     <div>
       ${row('optEasy', 'Bez diakritiky', 'Háčky a čárky se nerozlišují, E a Ě je stejné písmeno. Klávesnice se zjednoduší.', settings.easy, locked)}
       ${row('optHard', 'Těžký režim', 'Uhodnutá písmena musíš použít v každém dalším pokusu.', settings.hard, locked)}
@@ -678,6 +782,11 @@ function showSettings() {
   const bind = (id, key, after) => { document.getElementById(id).onchange = e => { settings[key] = e.target.checked; store.set('slovicko-nastaveni', settings); after && after(); }; };
   const applyMode = () => { if (!game.guesses.length && !game.over) { game.easy = settings.easy; game.hard = settings.hard; game.current = []; buildBoard(); buildKb(); updateStatus(); } };
   bind('optEasy', 'easy', applyMode); bind('optHard', 'hard', applyMode);
+  document.getElementById('skins').onclick = e => {
+    const b = e.target.closest('.skin'); if (!b) return;
+    settings.skin = b.dataset.skin; store.set('slovicko-nastaveni', settings); applySkin(); tone(740, 0.05);
+    document.querySelectorAll('.skin').forEach(x => x.setAttribute('aria-pressed', x === b));
+  };
   bind('optCb', 'cb', applyCb); bind('optSound', 'sound', () => settings.sound && tone(660, 0.05));
   on('closeBtn', closeSheet);
 }
