@@ -140,21 +140,44 @@ button:focus-visible { outline: 3px solid var(--near); outline-offset: 2px; }
 
 @media (max-height: 640px) { .key { height: 44px; } .key.diac { height: 34px; } .tile { font-size: 1.5rem; } .board { width: min(100%, 270px); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+.tabs { display: flex; gap: 4px; background: var(--key); padding: 4px; border-radius: 999px; align-self: center; }
+.tab {
+  font: 700 0.85rem var(--body); color: var(--muted); background: transparent; border: 0;
+  padding: 7px 16px; border-radius: 999px; cursor: pointer;
+}
+.tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.status { text-align: center; color: var(--muted); font-size: 0.85rem; min-height: 1.2em; margin: -6px 0 0; font-variant-numeric: tabular-nums; }
+.status b { color: var(--ink); }
+.status button { font: 700 0.85rem var(--body); color: var(--hit); background: none; border: 0; cursor: pointer; padding: 0 0 0 6px; text-decoration: underline; }
+.row-btns { display: flex; gap: 8px; }
+.row-btns .primary { flex: 1; }
+.secondary {
+  flex: 1; font: 700 1rem var(--body); background: var(--key); color: var(--ink); border: 0;
+  border-radius: 10px; padding: 12px; cursor: pointer;
+}
+.countdown { text-align: center; color: var(--muted); font-size: 0.9rem; }
+.countdown b { display: block; font: 800 1.6rem var(--display); color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.copybox { width: 100%; min-height: 120px; font: 1rem/1.3 var(--body); background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px; box-sizing: border-box; }
 </style>
 </head>
 <body>
-
 <div class="app">
   <header>
     <div>
       <h1>Slovíčko<span class="dot">.</span></h1>
-      <p class="sub">Uhodni české slovo o 5 písmenech na 6 pokusů</p>
+      <p class="sub" id="sub">Uhodni české slovo o 5 písmenech na 6 pokusů</p>
     </div>
     <div class="btns">
       <button class="ghost" id="helpBtn" aria-label="Jak hrát">?</button>
       <button class="ghost" id="statsBtn">Skóre</button>
     </div>
   </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tabDaily" aria-selected="true">Dnešní slovo</button>
+    <button class="tab" role="tab" id="tabTrain" aria-selected="false">Trénink</button>
+  </div>
+  <p class="status" id="status"></p>
 
   <div class="board-wrap"><div class="board" id="board" aria-label="Hrací plocha"></div></div>
 
@@ -165,8 +188,10 @@ button:focus-visible { outline: 3px solid var(--near); outline-offset: 2px; }
 <div class="sheet-bg" id="sheetBg" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 
 <script>
-const RAW = `kniha strom skála louka hrnek kočka myška vesna zámek hrady město mrkev houba chléb máslo mléko pivko vínko židle lampa dveře tráva květy lilie barva hudba píseň bubny opera balet fotka obraz socha malíř slovo dopis psaní pošta banka mince cesta tunel vlaky motor brzda kufry měsíc mraky bouře kámen písek hlína potok kopec údolí liška zajíc srnka jelen kráva prase koník labuť vrána holub včela motýl štika opice zebra krtek ježek hlava prsty srdce vlasy loket palec skříň stěna schody sklep garáž brána klíče budík talíř lžíce nůžky hrnec pánev trouba guláš řízek salát těsto koláč buchta pizza rajče malina ořech sirup láska smích chyba nápad šance život domov vlast národ jazyk škola třída lekce tužka sešit křída míček hokej tenis šachy karty matka bratr holka strýc princ čert anděl rytíř pirát lékař hasič pekař herec večer týden kabát šátek sukně svetr bunda okurky mušle perla zlato stříbro trpaslík hřeben zrcadlo mýdlo ručník vločka kometa planeta raketa robot počítač myšák kuchař zelí sýrař čajník hrách fazole`;
-const WORDS = [...new Set(RAW.split(/\s+/).map(w => w.toLocaleUpperCase('cs')).filter(w => [...w].length === 5))];
+// Slova pro denní hru v pevném zamíchaném pořadí. Den 1 = 28. 10. 2026.
+const RAW = `písmo cihla maska dřevo vědec brada vlhko brouk prkno mraky socha kapsa pohár močál obruč mozek údolí lžíce lékař šířka karty opice přání kovář video vlast večer srnka peron vláda balet šunka panoš hrnek město větev hudba sauna západ hymna kašel linka husle sršeň salám osada jedle klaun jelen perla start firma želva chyba sucho chrám kotva žalud miska taťka banjo tůňka houba motýl datle pilot papír vesta mamka míček hádka párty hříbě štěně popel výlet talíř lekno nákup židle ořech šiška pátek blůza opera kabel kužel papež sukně tikot zubař kvádr vydra šroub lustr mušle cesta slovo holub zámek volby zajíc vlasy losos objem kaple párek návrh pánev loďka mobil triko národ lvice rádio nápad kočár mlýny sirup koala pirát jehla šakal lilek lišák kanár vagón motor sklář rákos bratr vlaky koník pupek krtek stěna svaly kozel trdlo kabát duben plány pošta tesař tuleň krysa batoh císař kolej kůlna taška salát úterý román vrata mléko javor říjen bazén lovec srdce autor oceán oblak banán hroch bříza seník pláně teplo skříň pupen balík tunel výška rajče mrkev kruhy kojot metro domov palec komár vážka šance tráva látka bubny myšák barva dívka pecen klika mýdlo lampa rytíř tchán guláš šátek matka třída pilka herec těsto paměť kečup hrnec hrabě koule banka nanuk kočka týden duchy chléb budík kolík jehně hrách písek řádek panda kámen čočka pasta bláto hasič pizza dárce brzda kořen tyčka dílna divák šachy nemoc beran helma chlad vánek panák tuňák sport hlína lilie labuť daněk brýle potok vývar nožík robot sklep taxík vejce mango župan zebra hosté štika srpen strom hrady okruh fenek zlato kufry kaňon garáž višeň kopec játra skála práce hrábě listí hokej kobka chlév princ kosti ježek sluha kokos louže kamna výhra řidič škola mnich smích dopis chata kráva malíř stráň hůlka včela celer závěs lůžko sokol kmotr brána drozd tenis závod pomoc obočí prach blesk věšák komín svetr prase myška ulice prsty délka leden láska palác máslo víčko fotka hlava dýmka horko sleva právo louky mince vrána vrták číslo sopka liška záliv holka nůžky lemur hotel řetěz deník plíce vozík anděl řízek atlas pekař koláč nehty povel hrnce klíče krůta tanec rybka obraz počet život měsíc buben sumec lekce baron bouře dárek sešit jazyk ptáče hyena datel beton jídlo okoun kniha sklad dveře sever žabka záhon křída rybář strýc kakao louka bunda loket disko zákon květy tužka harfa maják píseň konev obvod akord kapka švagr`;
+const WORDS = RAW.split(/\s+/).filter(Boolean).map(w => w.toLocaleUpperCase('cs'));
+const EPOCH = Date.UTC(2026, 9, 28);
 
 const ROWS = 6, LEN = 5;
 const KB = [
@@ -176,15 +201,24 @@ const KB = [
   ['ENTER','Y','X','C','V','B','N','M','Ď','Ť','Ň','⌫']
 ];
 const LETTER = /^[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]$/;
+const EMOJI = { hit: '🟩', near: '🟨', miss: '⬛' };
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 };
-let stats = store.get('slovicko-stats', { played: 0, won: 0, streak: 0, best: 0, dist: [0,0,0,0,0,0] });
 
-let answer, guesses, current, over, busy, lastWinRow = -1;
+function todayIndex() {
+  const n = new Date();
+  return Math.floor((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - EPOCH) / 86400000);
+}
+function dailyWord(day) { return WORDS[((day % WORDS.length) + WORDS.length) % WORDS.length]; }
+
+let stats = store.get('slovicko-stats-v2', { played: 0, won: 0, streak: 0, best: 0, dist: [0,0,0,0,0,0], lastDay: null, lastWonDay: null });
+
+let mode = 'daily', day, answer, guesses, results, current, over, won, busy;
 const boardEl = document.getElementById('board'), kbEl = document.getElementById('kb');
+const statusEl = document.getElementById('status');
 
 function buildBoard() {
   boardEl.innerHTML = '';
@@ -212,21 +246,76 @@ function buildKb() {
 kbEl.addEventListener('click', e => { const b = e.target.closest('.key'); if (b) { press(b.dataset.k); b.blur(); } });
 document.addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
-  if (!document.getElementById('sheetBg').hidden) { if (e.key === 'Escape' || e.key === 'Enter') closeSheet(); return; }
+  if (!sheetBg.hidden) { if (e.key === 'Escape') closeSheet(); return; }
   if (e.key === 'Enter') { e.preventDefault(); press('ENTER'); }
   else if (e.key === 'Backspace') press('⌫');
   else { const k = e.key.toLocaleUpperCase('cs'); if (LETTER.test(k)) press(k); }
 });
 
-function newGame() {
-  let pick; do { pick = WORDS[Math.floor(Math.random() * WORDS.length)]; } while (WORDS.length > 1 && pick === answer);
-  answer = pick; guesses = []; current = []; over = false; busy = false;
+function resetBoard() {
+  guesses = []; results = []; current = []; over = false; won = false; busy = false;
   buildBoard(); buildKb();
 }
+function startDaily() {
+  mode = 'daily'; day = todayIndex(); answer = dailyWord(day);
+  resetBoard();
+  const saved = store.get('slovicko-den', null);
+  if (saved && saved.day === day && Array.isArray(saved.guesses)) {
+    saved.guesses.forEach((g, r) => {
+      const word = [...g], res = score(word, [...answer]);
+      paintRow(r, word, res, false); guesses.push(word); results.push(res); colorKeys(word, res);
+    });
+    won = results.length > 0 && results[results.length - 1].every(x => x === 'hit');
+    over = won || guesses.length === ROWS;
+  }
+  updateStatus();
+}
+function startTraining() {
+  mode = 'train';
+  let pick; do { pick = WORDS[Math.floor(Math.random() * WORDS.length)]; } while (pick === answer || pick === dailyWord(todayIndex()));
+  answer = pick;
+  resetBoard(); updateStatus();
+}
+function setTab(m) {
+  document.getElementById('tabDaily').setAttribute('aria-selected', m === 'daily');
+  document.getElementById('tabTrain').setAttribute('aria-selected', m === 'train');
+  m === 'daily' ? startDaily() : startTraining();
+}
+document.getElementById('tabDaily').onclick = () => setTab('daily');
+document.getElementById('tabTrain').onclick = () => setTab('train');
+
+function updateStatus() {
+  if (mode === 'daily') {
+    statusEl.innerHTML = over
+      ? `Slovíčko č. ${day + 1} je hotové <button id="stShow">Výsledek</button>`
+      : `Slovíčko č. <b>${day + 1}</b> · stejné slovo pro všechny`;
+    const b = document.getElementById('stShow'); if (b) b.onclick = () => showStats('end');
+  } else {
+    statusEl.innerHTML = `Náhodné slovo, nepočítá se do skóre <button id="stNew">Nové slovo</button>`;
+    document.getElementById('stNew').onclick = startTraining;
+  }
+}
+
 function rowEl(r) { return boardEl.children[r]; }
 function paintCurrent() {
   const tiles = rowEl(guesses.length).children;
   for (let i = 0; i < LEN; i++) { tiles[i].textContent = current[i] || ''; tiles[i].classList.toggle('filled', !!current[i]); }
+}
+function paintRow(r, word, res, animate) {
+  const tiles = rowEl(r).children;
+  word.forEach((ch, i) => {
+    tiles[i].textContent = ch;
+    if (!animate) { tiles[i].classList.add(res[i]); return; }
+    setTimeout(() => { tiles[i].classList.add('flip'); setTimeout(() => tiles[i].classList.add(res[i]), 220); }, i * 260);
+  });
+}
+const RANK = { miss: 1, near: 2, hit: 3 };
+function colorKeys(word, res) {
+  word.forEach((ch, i) => {
+    const key = kbEl.querySelector(`[data-k="${ch}"]`); if (!key) return;
+    const prev = ['hit','near','miss'].find(c => key.classList.contains(c));
+    if (!prev || RANK[res[i]] > RANK[prev]) { key.classList.remove('hit','near','miss'); key.classList.add(res[i]); }
+  });
 }
 function press(k) {
   if (over || busy) return;
@@ -240,62 +329,94 @@ function score(guess, target) {
   for (let i = 0; i < LEN; i++) { if (res[i] !== 'hit' && left[guess[i]]) { res[i] = 'near'; left[guess[i]]--; } }
   return res;
 }
-const RANK = { miss: 1, near: 2, hit: 3 };
 function submit() {
   const r = guesses.length;
   if (current.length < LEN) { toast('Slovo musí mít 5 písmen'); shake(r); return; }
-  const target = [...answer], res = score(current, target);
-  const tiles = rowEl(r).children, word = current.slice();
+  if (mode === 'daily' && day !== todayIndex()) { toast('Začal nový den, načítám nové slovo'); setTimeout(startDaily, 900); return; }
+  const word = current.slice(), res = score(word, [...answer]);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   busy = true;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, step = reduce ? 0 : 260;
-  word.forEach((ch, i) => setTimeout(() => {
-    tiles[i].classList.add('flip');
-    setTimeout(() => { tiles[i].classList.add(res[i]); }, reduce ? 0 : 220);
-  }, i * step));
+  paintRow(r, word, res, !reduce);
+  guesses.push(word); results.push(res); current = [];
+  if (mode === 'daily') store.set('slovicko-den', { day, guesses: guesses.map(g => g.join('')) });
   setTimeout(() => {
-    word.forEach((ch, i) => {
-      const key = kbEl.querySelector(`[data-k="${ch}"]`); if (!key) return;
-      const prev = ['hit','near','miss'].find(c => key.classList.contains(c));
-      if (!prev || RANK[res[i]] > RANK[prev]) { key.classList.remove('hit','near','miss'); key.classList.add(res[i]); }
-    });
-    guesses.push(word); current = []; busy = false;
-    const won = res.every(x => x === 'hit');
-    if (won) finish(true, r);
-    else if (guesses.length === ROWS) finish(false, r);
-  }, LEN * step + (reduce ? 0 : 250));
+    colorKeys(word, res); busy = false;
+    won = res.every(x => x === 'hit');
+    if (won || guesses.length === ROWS) finish(r);
+  }, reduce ? 0 : LEN * 260 + 250);
 }
-function finish(won, r) {
+function finish(r) {
   over = true;
-  stats.played++;
-  if (won) { stats.won++; stats.streak++; stats.best = Math.max(stats.best, stats.streak); stats.dist[r]++; lastWinRow = r; }
-  else { stats.streak = 0; lastWinRow = -1; }
-  store.set('slovicko-stats', stats);
+  if (mode === 'daily' && stats.lastDay !== day) {
+    stats.played++; stats.lastDay = day;
+    if (won) {
+      stats.won++; stats.dist[r]++;
+      stats.streak = stats.lastWonDay === day - 1 ? stats.streak + 1 : 1;
+      stats.best = Math.max(stats.best, stats.streak); stats.lastWonDay = day;
+    } else stats.streak = 0;
+    store.set('slovicko-stats-v2', stats);
+  }
   if (won) {
     [...rowEl(r).children].forEach((t, i) => { t.style.animationDelay = (i * 90) + 'ms'; t.classList.remove('flip'); void t.offsetWidth; t.classList.add('win'); });
     toast(['Génius!','Skvělé!','Výborně!','Pěkně!','Uf, dobrý!','Na poslední chvíli!'][r]);
   }
-  setTimeout(() => showStats(won ? 'win' : 'lose'), 1300);
+  updateStatus();
+  setTimeout(() => showStats('end'), 1300);
 }
 function shake(r) { const el = rowEl(r); el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
 
 let toastTimer;
 function toast(msg) {
   const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false;
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 1600);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 1800);
 }
 
 const sheetBg = document.getElementById('sheetBg'), sheet = document.getElementById('sheet');
+let cdTimer;
 function openSheet(html) { sheet.innerHTML = html; sheetBg.hidden = false; const b = sheet.querySelector('button'); b && b.focus(); }
-function closeSheet() { sheetBg.hidden = true; }
+function closeSheet() { sheetBg.hidden = true; clearInterval(cdTimer); }
 sheetBg.addEventListener('click', e => { if (e.target === sheetBg) closeSheet(); });
 
-function showStats(mode) {
+function untilMidnight() {
+  const n = new Date(), m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1);
+  const s = Math.max(0, Math.floor((m - n) / 1000));
+  return [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(x => String(x).padStart(2, '0')).join(':');
+}
+function shareText() {
+  const head = `Slovíčko č. ${day + 1}  ${won ? guesses.length : 'X'}/6`;
+  const grid = results.map(r => r.map(x => EMOJI[x]).join('')).join('\n');
+  const url = location.protocol.startsWith('http') && !location.hostname.endsWith('claude.ai') && !location.hostname.endsWith('claudeusercontent.com') ? '\n' + location.origin + location.pathname : '';
+  return `${head}\n\n${grid}${url}`;
+}
+async function share() {
+  const text = shareText();
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  try { await navigator.clipboard.writeText(text); toast('Výsledek zkopírován, vlož ho do zprávy'); }
+  catch {
+    const box = document.createElement('textarea'); box.className = 'copybox'; box.value = text; box.readOnly = true;
+    sheet.insertBefore(box, sheet.lastElementChild); box.focus(); box.select();
+    toast('Označeno, zkopíruj pomocí Ctrl+C');
+  }
+}
+
+function showStats(kind) {
   const pct = stats.played ? Math.round(stats.won / stats.played * 100) : 0;
   const max = Math.max(1, ...stats.dist);
-  const head = mode === 'win' ? `<h2>Uhodnuto na ${guesses.length}. pokus</h2><div class="answer">${answer}</div>`
-    : mode === 'lose' ? `<h2>Tentokrát to nevyšlo</h2><p>Hledané slovo bylo</p><div class="answer">${answer}</div>`
-    : `<h2>Tvoje skóre</h2>`;
-  const bars = stats.dist.map((n, i) => `<div class="bar"><span>${i+1}</span><i class="${mode==='win' && i===lastWinRow ? 'now' : ''}" style="width:${Math.max(8, n/max*100)}%">${n}</i></div>`).join('');
+  const ended = kind === 'end' && over;
+  const winRow = ended && won ? guesses.length - 1 : -1;
+  let head = '<h2>Tvoje skóre</h2><p>Počítají se jen hry s dnešním slovem.</p>';
+  if (ended) head = won
+    ? `<h2>Uhodnuto na ${guesses.length}. pokus</h2><div class="answer">${answer}</div>`
+    : `<h2>Tentokrát to nevyšlo</h2><p>Hledané slovo bylo</p><div class="answer">${answer}</div>`;
+  const bars = stats.dist.map((n, i) => `<div class="bar"><span>${i+1}</span><i class="${mode === 'daily' && i === winRow ? 'now' : ''}" style="width:${Math.max(8, n/max*100)}%">${n}</i></div>`).join('');
+  let actions;
+  if (ended && mode === 'daily') actions = `
+    <div class="countdown">Další slovo za<b id="cd">${untilMidnight()}</b></div>
+    <div class="row-btns"><button class="primary" id="shareBtn">Sdílet výsledek</button><button class="secondary" id="trainBtn">Trénink</button></div>`;
+  else if (ended) actions = `<div class="row-btns"><button class="primary" id="againBtn">Další slovo</button><button class="secondary" id="closeBtn">Zavřít</button></div>`;
+  else actions = `<button class="primary" id="closeBtn">Hrát dál</button>`;
   openSheet(`${head}
     <div class="stats">
       <div><b>${stats.played}</b><span>Her</span></div>
@@ -304,26 +425,41 @@ function showStats(mode) {
       <div><b>${stats.best}</b><span>Nejlepší</span></div>
     </div>
     <div class="dist">${bars}</div>
-    <button class="primary" id="again">${over ? 'Nové slovo' : 'Hrát dál'}</button>`);
-  document.getElementById('again').onclick = () => { closeSheet(); if (over) newGame(); };
+    ${actions}`);
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+  on('shareBtn', share);
+  on('trainBtn', () => { closeSheet(); setTab('train'); });
+  on('againBtn', () => { closeSheet(); startTraining(); });
+  on('closeBtn', closeSheet);
+  if (document.getElementById('cd')) {
+    cdTimer = setInterval(() => {
+      const el = document.getElementById('cd'); if (!el) return clearInterval(cdTimer);
+      el.textContent = untilMidnight();
+      if (mode === 'daily' && todayIndex() !== day) { closeSheet(); startDaily(); toast('Je tu nové slovo!'); }
+    }, 1000);
+  }
 }
 function showHelp() {
   openSheet(`<h2>Jak hrát</h2>
-    <p>Napiš libovolné slovo o 5 písmenech a potvrď tlačítkem Hádat. Háčky a čárky se počítají jako samostatná písmena, takže E a Ě nejsou totéž.</p>
+    <p>Každý den je jedno nové slovo, stejné pro všechny. Napiš libovolné slovo o 5 písmenech a potvrď tlačítkem Hádat. Háčky a čárky se počítají jako samostatná písmena, takže E a Ě nejsou totéž.</p>
     <div class="legend">
       <div><span class="tile hit">K</span> písmeno je ve slově na správném místě</div>
       <div><span class="tile near">O</span> písmeno ve slově je, ale jinde</div>
       <div><span class="tile miss">Z</span> písmeno ve slově není</div>
     </div>
-    <p>Hledaná slova jsou běžná podstatná jména v 1. pádě.</p>
+    <p>Hledaná slova jsou běžná podstatná jména. Po dohrání můžeš sdílet výsledek nebo si zahrát Trénink s náhodnými slovy.</p>
     <button class="primary" id="ok">Jdu hrát</button>`);
   document.getElementById('ok').onclick = closeSheet;
 }
-document.getElementById('statsBtn').onclick = () => showStats('view');
+document.getElementById('statsBtn').onclick = () => showStats(over && mode === 'daily' ? 'end' : 'view');
 document.getElementById('helpBtn').onclick = showHelp;
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && mode === 'daily' && day !== todayIndex() && !busy) { closeSheet(); startDaily(); }
+});
 
-newGame();
+startDaily();
 if (!store.get('slovicko-seen', false)) { store.set('slovicko-seen', true); setTimeout(showHelp, 300); }
+else if (over) setTimeout(() => showStats('end'), 300);
 </script>
 </body>
 </html>
