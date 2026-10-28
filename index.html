@@ -106,6 +106,13 @@
   color-scheme: dark;
 }
 :root.cb { --hit: #e3742b; --near: #3d8fd6; --on-hit: #ffffff; --on-near: #ffffff; }
+/* Volitelná červená pro písmena, která ve slově nejsou (vypnutá v režimu pro barvoslepé) */
+:root.red { --miss: #b5544a; --on-miss: #ffffff; }
+@media (prefers-color-scheme: dark) { :root.red:not([data-skin]) { --miss: #8e3f38; } }
+:root.red[data-skin="sesit"] { --miss: #f4b4aa; --on-miss: #1f2f6b; }
+:root.red[data-skin="klasika"] { --miss: #a8483a; --on-miss: #fff8ec; }
+:root.red[data-skin="tabule"] { --miss: #e39a95; --on-miss: #13261c; }
+:root.red[data-skin="moderni"] { --miss: #d9536a; --on-miss: #ffffff; }
 html, body { height: 100%; }
 html { background: var(--bg); }
 body {
@@ -358,7 +365,7 @@ let games = store.get('slovicko-hry', {});
 function todayIndex() { const n = new Date(); return Math.floor((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - EPOCH) / 864e5); }
 function wordFor(day) { return ANSWERS[((day % ANSWERS.length) + ANSWERS.length) % ANSWERS.length]; }
 function dateFor(day) { const d = new Date(EPOCH + day * 864e5); return `${d.getUTCDate()}. ${d.getUTCMonth() + 1}.`; }
-function applyCb() { document.documentElement.classList.toggle('cb', settings.cb); }
+function applyCb() { document.documentElement.classList.toggle('cb', settings.cb); document.documentElement.classList.toggle('red', !!settings.red && !settings.cb); }
 applyCb();
 
 
@@ -651,7 +658,7 @@ function untilMidnight() {
 }
 function shareText() {
   const g = game, cbm = settings.cb;
-  const em = { hit: cbm ? '🟧' : '🟩', near: cbm ? '🟦' : '🟨', miss: '⬛' };
+  const em = { hit: cbm ? '🟧' : '🟩', near: cbm ? '🟦' : '🟨', miss: settings.red && !cbm ? '🟥' : '⬛' };
   let head = g.kind === 'challenge'
     ? `Slovíčko – výzva${g.from ? ' od ' + g.from : ''}  ${g.won ? g.guesses.length : 'X'}/6`
     : `Slovíčko č. ${g.day + 1}  ${g.won ? g.guesses.length : 'X'}/6`;
@@ -825,6 +832,7 @@ function showSettings() {
     <div>
       ${row('optEasy', 'Bez diakritiky', 'Háčky a čárky se nerozlišují, E a Ě je stejné písmeno. Klávesnice se zjednoduší.', settings.easy, locked)}
       ${row('optHard', 'Těžký režim', 'Uhodnutá písmena musíš použít v každém dalším pokusu.', settings.hard, locked)}
+      ${row('optRed', 'Červená pro chybějící písmena', settings.cb ? 'Nedá se kombinovat s barvami pro barvoslepé.' : 'Písmena, která ve slově nejsou, se obarví červeně místo šedé.', settings.red, settings.cb)}
       ${row('optCb', 'Barvy pro barvoslepé', 'Oranžová a modrá místo zelené a žluté.', settings.cb, false)}
       ${row('optSound', 'Zvuky a vibrace', 'Cvaknutí kláves, zvuky při odkrývání a vibrace na mobilu.', settings.sound, false)}
     </div>
@@ -838,7 +846,8 @@ function showSettings() {
     settings.skin = b.dataset.skin; store.set('slovicko-nastaveni', settings); applySkin(); track('vzhled-' + settings.skin, 'Zvolený vzhled: ' + settings.skin); tone(740, 0.05);
     document.querySelectorAll('.skin').forEach(x => x.setAttribute('aria-pressed', x === b));
   };
-  bind('optCb', 'cb', applyCb); bind('optSound', 'sound', () => settings.sound && tone(660, 0.05));
+  bind('optRed', 'red', applyCb);
+  bind('optCb', 'cb', () => { applyCb(); const r = document.getElementById('optRed'); if (r) { r.disabled = settings.cb; r.closest('.opt').querySelector('small').textContent = settings.cb ? 'Nedá se kombinovat s barvami pro barvoslepé.' : 'Písmena, která ve slově nejsou, se obarví červeně místo šedé.'; } }); bind('optSound', 'sound', () => settings.sound && tone(660, 0.05));
   on('closeBtn', closeSheet);
 }
 function showHelp() {
