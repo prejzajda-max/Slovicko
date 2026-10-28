@@ -165,9 +165,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 @keyframes shake { 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
 @keyframes hop { 40% { transform: translateY(-14px); } }
 
-.about { max-width: 500px; margin: 0 auto; padding-block: 28px 32px; border-top: 1px solid var(--line); color: var(--muted); line-height: 1.55; }
-.about h2 { font: 800 1.15rem var(--display); color: var(--ink); margin: 0 0 8px; text-wrap: balance; }
-.about p { margin: 0 0 10px; max-width: 65ch; }
 .kb { display: flex; flex-direction: column; gap: 6px; user-select: none; }
 .kr { display: flex; gap: 4px; justify-content: center; }
 .key { flex: 1 1 0; min-width: 0; height: 50px; max-width: 44px; font: 700 1rem var(--body); color: var(--key-ink); background: var(--key); box-shadow: var(--key-shadow); border: 0; border-radius: var(--key-radius); cursor: pointer; padding: 0; display: grid; place-items: center; }
@@ -329,11 +326,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 <aside class="side" id="side" aria-label="Přehled"></aside>
 </div>
 
-<footer class="about">
-  <h2>Slovíčko: česká hra na hádání slov</h2>
-  <p>Slovíčko je česká obdoba populární hry Wordle. Každý den je připravené jedno nové slovo o pěti písmenech, stejné pro všechny hráče. Máš šest pokusů a po každém z nich barvy prozradí, která písmena ve slově jsou a jestli stojí na správném místě.</p>
-  <p>Hra počítá s háčky a čárkami, ale dá se hrát i bez diakritiky. Kromě slova dne nabízí trénink s náhodnými slovy, archiv starších slovíček, těžký režim a výzvy, ve kterých kamarádovi pošleš vlastní slovo k uhodnutí. Hraje se zdarma v prohlížeči na mobilu i počítači, bez registrace a bez reklam.</p>
-</footer>
 
 <div class="toast" id="toast" role="status" hidden></div>
 <div class="sheet-bg" id="sheetBg" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
