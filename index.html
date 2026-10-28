@@ -273,6 +273,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .side .answer { font-size: 1.4rem; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
+<script data-goatcounter="https://zajda95.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div class="stage">
@@ -345,6 +346,10 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 };
+// Anonymní statistiky (GoatCounter, bez cookies). Události vidí jen majitel počítadla.
+function track(name, title) {
+  try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: title || name, event: true }); } catch {}
+}
 let settings = Object.assign({ easy: false, hard: false, cb: false, sound: true, skin: 'klasicky' }, store.get('slovicko-nastaveni', {}));
 let stats = store.get('slovicko-stats-v2', { played: 0, won: 0, streak: 0, best: 0, dist: [0,0,0,0,0,0], lastDay: null, lastWonDay: null });
 let games = store.get('slovicko-hry', {});
@@ -520,7 +525,7 @@ function useHint() {
   const free = [...Array(LEN).keys()].filter(i => !known.has(i));
   if (!free.length) return;
   g.hint = free[Math.floor(Math.random() * free.length)];
-  saveGame(); updateStatus(); tone(880, 0.12, 'sine', 0.05);
+  saveGame(); updateStatus(); tone(880, 0.12, 'sine', 0.05); track('napoveda', 'Použitá nápověda');
   toast(`${g.hint + 1}. písmeno je ${g.answer[g.hint]}`);
   void t;
 }
@@ -612,6 +617,10 @@ function finish(r) {
     } else stats.streak = 0;
     store.set('slovicko-stats-v2', stats);
   }
+  track(
+    g.kind === 'daily' ? (g.won ? `dnesni-vyhra-${r + 1}-pokus` : 'dnesni-prohra') :
+    g.kind === 'archive' ? 'archiv-dohrano' : g.kind === 'challenge' ? 'vyzva-dohrana' : 'trenink-dohrano',
+    g.kind === 'daily' ? (g.won ? `Dnešní slovo: výhra na ${r + 1}. pokus` : 'Dnešní slovo: prohra') : undefined);
   if (g.won) {
     [...rowEl(r).children].forEach((t, i) => { t.style.animationDelay = (i * 90) + 'ms'; t.classList.remove('flip'); void t.offsetWidth; t.classList.add('win'); });
     toast(['Génius!','Skvělé!','Výborně!','Pěkně!','Uf, dobrý!','Na poslední chvíli!'][r]); sfx.win(); setTimeout(confetti, 350);
@@ -654,7 +663,7 @@ function shareText() {
   return `${head}\n\n${grid}${url}`;
 }
 async function share() {
-  const text = shareText();
+  const text = shareText(); track('sdileni-vysledku', 'Sdílení výsledku');
   if (navigator.share && matchMedia('(pointer: coarse)').matches) {
     try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
   }
@@ -757,6 +766,7 @@ function showMakeChallenge() {
     if ([...w].length !== LEN) return fail('Slovo musí mít přesně 5 písmen.');
     if (!DICT.has(w)) return fail('Tohle slovo hra nezná. Zkus jiné, nebo zkontroluj háčky a čárky.');
     store.set('slovicko-jmeno', n);
+    track('vyzva-vytvorena', 'Vytvořená výzva');
     made = { url: `${baseUrl()}#v${encodeChallenge(w, n)}`, n };
     const box = document.getElementById('chLink'); box.value = made.url;
     document.getElementById('chOut').hidden = false;
@@ -825,7 +835,7 @@ function showSettings() {
   bind('optEasy', 'easy', applyMode); bind('optHard', 'hard', applyMode);
   document.getElementById('skins').onclick = e => {
     const b = e.target.closest('.skin'); if (!b) return;
-    settings.skin = b.dataset.skin; store.set('slovicko-nastaveni', settings); applySkin(); tone(740, 0.05);
+    settings.skin = b.dataset.skin; store.set('slovicko-nastaveni', settings); applySkin(); track('vzhled-' + settings.skin, 'Zvolený vzhled: ' + settings.skin); tone(740, 0.05);
     document.querySelectorAll('.skin').forEach(x => x.setAttribute('aria-pressed', x === b));
   };
   bind('optCb', 'cb', applyCb); bind('optSound', 'sound', () => settings.sound && tone(660, 0.05));
