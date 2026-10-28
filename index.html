@@ -269,6 +269,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .side .legend { font-size: .88rem; gap: 6px; }
 .side .legend .tile { width: 28px; font-size: .95rem; --tile-scale: 1; }
 .side .primary { flex: none; }
+.side .mean { background: var(--bg); }
+.side .answer { font-size: 1.4rem; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -859,7 +861,7 @@ function renderSide() {
       <div><b>${stats.played}</b><span>Her</span></div><div><b>${pct}%</b><span>Výher</span></div>
       <div><b>${stats.streak}</b><span>Série</span></div><div><b>${stats.best}</b><span>Nejlepší</span></div>
     </div>
-    ${dailyOver ? '<button class="primary" id="sideShare">Sdílet dnešní výsledek</button>' : ''}
+    ${dailyOver ? meaningBlock(game.answer) + '<button class="primary" id="sideShare">Sdílet dnešní výsledek</button>' : ''}
     <div class="legend">
       <div><span class="tile hit">K</span> správné místo</div>
       <div><span class="tile near">O</span> ve slově, ale jinde</div>
@@ -894,7 +896,6 @@ if (firstChal) {
 } else {
   startGame('daily', todayIndex());
   if (!store.get('slovicko-seen', false)) { store.set('slovicko-seen', true); setTimeout(showHelp, 300); }
-  else if (game.over) setTimeout(showEnd, 300);
 }
 </script>
 </body>
