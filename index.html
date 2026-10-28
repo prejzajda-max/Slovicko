@@ -197,12 +197,31 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .stats span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 .dist { display: flex; flex-direction: column; gap: 4px; }
 .bar { display: grid; grid-template-columns: 14px 1fr; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; font-size: .85rem; }
-.bar i { display: block; background: var(--miss); color: var(--on-miss); font-style: normal; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-align: right; min-width: 22px; box-sizing: border-box; }
+.bar i { display: block; background: var(--key); color: var(--key-ink); font-style: normal; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-align: right; min-width: 22px; box-sizing: border-box; }
+.calhead { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.calhead b { font: var(--title-weight) 1.1rem var(--title-font); }
+.calhead .ib { width: 34px; height: 34px; font-size: 1.2rem; }
+.calhead .ib:disabled { opacity: .35; cursor: default; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.cal .wd { font-size: .7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; padding-bottom: 2px; }
+.cal .cd { aspect-ratio: 1; display: grid; place-items: center; border-radius: 8px; font-size: .85rem; font-variant-numeric: tabular-nums; background: var(--bg); color: var(--ink); }
+.cal .cd.off { opacity: .35; background: none; }
+.cal .cd.won { background: var(--hit); color: var(--on-hit); font-weight: 700; }
+.cal .cd.lost { background: var(--miss); color: var(--on-miss); font-weight: 700; }
+.cal .cd.part { box-shadow: inset 0 0 0 2px var(--near); }
+.cal .cd.now { outline: 2px solid var(--ink); outline-offset: 1px; }
+.callegend { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; font-size: .78rem; color: var(--muted); }
+.callegend span { display: flex; align-items: center; gap: 5px; }
+.callegend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.callegend i.won { background: var(--hit); } .callegend i.lost { background: var(--miss); } .callegend i.part { box-shadow: inset 0 0 0 2px var(--near); }
+a.secondary.dl { display: grid; place-items: center; text-decoration: none; }
 .bar i.now { background: var(--hit); color: var(--on-hit); }
 .primary, .secondary { flex: 1; font: 700 1rem var(--body); border: 0; border-radius: 10px; padding: 12px; cursor: pointer; }
 .primary { background: var(--hit); color: var(--on-hit); }
 .secondary { background: var(--key); color: var(--ink); }
 .row-btns { display: flex; gap: 8px; }
+.links { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; }
+.imgprev { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; }
 .countdown { text-align: center; color: var(--muted); font-size: 0.9rem; }
 .countdown b { display: block; font: 800 1.6rem var(--display); color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .legend { display: flex; flex-direction: column; gap: 8px; }
@@ -281,6 +300,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 .bigbtn.del { background: var(--key); color: var(--key-ink); height: 60px; font-size: 1.15rem; }
 .bigbtn:active { transform: translateY(2px); box-shadow: none; }
 .bigbtn:disabled { opacity: .45; cursor: default; }
+.lefthead { margin: 0 4px 2px; font: var(--title-weight) 1.25rem/1.25 var(--title-font); color: var(--ink); text-align: center; text-wrap: balance; }
 .kbhint { margin: 2px 4px 0; color: var(--muted); font-size: .85rem; line-height: 1.4; text-align: center; }
 .side .mean { background: var(--bg); }
 .side .answer { font-size: 1.4rem; }
@@ -290,11 +310,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--near); outl
 </head>
 <body>
 <div class="stage">
-<aside class="side-left" aria-label="Ovládání">
-  <button class="bigbtn go" id="leftEnter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Hádat</button>
-  <button class="bigbtn del" id="leftDel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM18 9l-6 6M12 9l6 6"/></svg>Smazat</button>
-  <p class="kbhint">Na klávesnici počítače funguje i Enter a Backspace.</p>
-</aside>
+<aside class="side-left" id="sideLeft" aria-label="Ovládání"></aside>
 <div class="app">
   <header>
     <h1><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="7" width="34" height="31" rx="8" style="fill:var(--hit)"/><path d="M12 4 L19 10 L26 4" style="fill:none;stroke:var(--near);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round"/><text x="19" y="31" text-anchor="middle" style="font-family:var(--tile-font);font-weight:700;font-size:22px;fill:var(--on-hit)">S</text></svg><span>Slovíčko<span class="dot">.</span></span></h1>
@@ -701,14 +717,14 @@ function showEnd() {
     : `<h2>Tentokrát to nevyšlo</h2><p>Hledané slovo bylo</p>`) + meaningBlock(g.answer);
   if (g.kind === 'challenge') {
     openSheet(`${head}<p>Pošli ${g.from ? esc(g.from) : 'kamarádovi'} svůj výsledek, nebo mu vymysli slovo na oplátku.</p>
-      <div class="row-btns"><button class="primary" id="shareBtn">Poslat výsledek</button><button class="secondary" id="makeBtn">Vlastní výzva</button></div>
-      <button class="link" id="dailyLink">Zpět na dnešní slovo</button>`);
+      <div class="row-btns"><button class="primary" id="shareBtn">Poslat výsledek</button><button class="secondary" id="imgBtn">Obrázek</button></div>
+      <div class="links"><button class="link" id="makeBtn">Vlastní výzva</button><button class="link" id="dailyLink">Zpět na dnešní slovo</button></div>`);
     on('makeBtn', showMakeChallenge); on('dailyLink', () => { closeSheet(); startGame('daily', todayIndex()); });
   } else if (g.kind === 'daily') {
     openSheet(`${head}${statsBlock(g.won ? g.guesses.length - 1 : -1)}
       <div class="countdown">Další slovo za<b id="cd">${untilMidnight()}</b></div>
-      <div class="row-btns"><button class="primary" id="shareBtn">Sdílet výsledek</button><button class="secondary" id="trainBtn">Trénink</button></div>
-      <button class="link" id="archLink">Dohrát starší slovíčka v archivu</button>`);
+      <div class="row-btns"><button class="primary" id="shareBtn">Sdílet výsledek</button><button class="secondary" id="imgBtn">Obrázek</button></div>
+      <div class="links"><button class="link" id="trainBtn">Zahrát trénink</button><button class="link" id="archLink">Archiv slovíček</button></div>`);
     cdTimer = setInterval(() => {
       const el = document.getElementById('cd'); if (!el) return clearInterval(cdTimer);
       el.textContent = untilMidnight();
@@ -716,12 +732,13 @@ function showEnd() {
     }, 1000);
   } else if (g.kind === 'archive') {
     openSheet(`${head}<p>Hry z archivu se nepočítají do skóre ani série.</p>
-      <div class="row-btns"><button class="primary" id="shareBtn">Sdílet výsledek</button><button class="secondary" id="archLink">Další z archivu</button></div>`);
+      <div class="row-btns"><button class="primary" id="shareBtn">Sdílet výsledek</button><button class="secondary" id="imgBtn">Obrázek</button></div>
+      <div class="links"><button class="link" id="archLink">Další z archivu</button></div>`);
   } else {
     openSheet(`${head}<p>Tréninková hra se nepočítá do skóre.</p>
       <div class="row-btns"><button class="primary" id="againBtn">Další slovo</button><button class="secondary" id="closeBtn">Zavřít</button></div>`);
   }
-  on('shareBtn', share); on('trainBtn', () => { closeSheet(); startGame('train'); });
+  on('shareBtn', share); on('imgBtn', showImage); on('trainBtn', () => { closeSheet(); startGame('train'); });
   on('archLink', showArchive); on('againBtn', () => { closeSheet(); startGame('train'); }); on('closeBtn', closeSheet);
 }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -797,9 +814,92 @@ async function sendChallenge(made) {
   catch { const box = document.getElementById('chLink'); if (box) { box.focus(); box.select(); } toast('Odkaz je označený, zkopíruj ho pomocí Ctrl+C'); }
 }
 
+const MONTHS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+function dayState(d) {
+  const rec = games[d]; if (!rec || !rec.g || !rec.g.length) return '';
+  const w = rec.easy ? strip(wordFor(d)) : wordFor(d);
+  return rec.g.includes(w) ? 'won' : rec.g.length >= ROWS ? 'lost' : 'part';
+}
+function calendarHtml(y, m) {
+  const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7, today = todayIndex();
+  let cells = ['Po','Út','St','Čt','Pá','So','Ne'].map(x => `<span class="wd">${x}</span>`).join('') + '<span></span>'.repeat(lead);
+  for (let i = 1; i <= days; i++) {
+    const d = Math.round((Date.UTC(y, m, i) - EPOCH) / 864e5);
+    const st = d >= 0 && d <= today ? dayState(d) : '';
+    const cls = ['cd', st, d === today ? 'now' : '', d < 0 || d > today ? 'off' : ''].join(' ');
+    cells += `<span class="${cls}" title="${i}. ${m + 1}.${st === 'won' ? ' – uhodnuto' : st === 'lost' ? ' – neuhodnuto' : ''}">${i}</span>`;
+  }
+  return cells;
+}
+let calY, calM;
 function showStats() {
-  openSheet(`<h2>Tvoje skóre</h2><p>Počítají se jen dnešní slovíčka, hraná ve svůj den.</p>${statsBlock(-1)}<button class="primary" id="closeBtn">Zavřít</button>`);
+  const n = new Date(); calY = n.getFullYear(); calM = n.getMonth();
+  openSheet(`<h2>Tvoje skóre</h2><p>Počítají se jen dnešní slovíčka, hraná ve svůj den.</p>${statsBlock(-1)}
+    <div class="calhead"><button class="ib" id="calPrev" aria-label="Předchozí měsíc">‹</button><b id="calTitle"></b><button class="ib" id="calNext" aria-label="Další měsíc">›</button></div>
+    <div class="cal" id="cal"></div>
+    <div class="callegend"><span><i class="won"></i>uhodnuto</span><span><i class="lost"></i>neuhodnuto</span><span><i class="part"></i>rozehráno</span></div>
+    <button class="primary" id="closeBtn">Zavřít</button>`);
+  const draw = () => {
+    document.getElementById('cal').innerHTML = calendarHtml(calY, calM);
+    document.getElementById('calTitle').textContent = `${MONTHS[calM]} ${calY}`;
+    const start = new Date(EPOCH), now = new Date();
+    document.getElementById('calPrev').disabled = calY * 12 + calM <= start.getUTCFullYear() * 12 + start.getUTCMonth();
+    document.getElementById('calNext').disabled = calY * 12 + calM >= now.getFullYear() * 12 + now.getMonth();
+  };
+  on('calPrev', () => { calM--; if (calM < 0) { calM = 11; calY--; } draw(); });
+  on('calNext', () => { calM++; if (calM > 11) { calM = 0; calY++; } draw(); });
+  draw(); on('closeBtn', closeSheet);
+}
+
+// ---------- obrázek výsledku ----------
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+async function drawResult() {
+  try { await document.fonts.ready; } catch {}
+  const g = game, S = 1080, cv = document.createElement('canvas'); cv.width = cv.height = S;
+  const ctx = cv.getContext('2d'), cs = getComputedStyle(document.documentElement), v = k => cs.getPropertyValue(k).trim();
+  const titleFont = v('--title-font'), tileFont = v('--tile-font');
+  ctx.fillStyle = v('--bg'); ctx.fillRect(0, 0, S, S);
+  ctx.fillStyle = v('--surface'); rr(ctx, 60, 60, S - 120, S - 120, 44); ctx.fill();
+  // logo
+  ctx.fillStyle = v('--hit'); rr(ctx, 120, 130, 96, 88, 22); ctx.fill();
+  ctx.strokeStyle = v('--near'); ctx.lineWidth = 12; ctx.lineCap = ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(140, 112); ctx.lineTo(168, 132); ctx.lineTo(196, 112); ctx.stroke();
+  ctx.fillStyle = v('--on-hit'); ctx.font = `700 62px ${tileFont}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('S', 168, 178);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = v('--ink'); ctx.font = `${v('--title-weight') || 800} 66px ${titleFont}`; ctx.fillText('Slovíčko', 244, 192);
+  ctx.fillStyle = v('--muted'); ctx.font = `700 34px ${v('--body')}`;
+  const sub = g.kind === 'challenge' ? `Výzva${g.from ? ' od ' + g.from : ''}` : g.kind === 'train' ? 'Trénink' : `č. ${g.day + 1} · ${dateFor(g.day)} ${new Date(EPOCH + g.day * 864e5).getUTCFullYear()}`;
+  ctx.fillText(sub, 246, 240);
+  ctx.textAlign = 'right'; ctx.fillStyle = g.won ? v('--hit') : v('--ink'); ctx.font = `800 96px ${v('--display')}`;
+  ctx.fillText(`${g.won ? g.guesses.length : 'X'}/6`, S - 120, 218);
+  const marks = [g.hard && 'těžký režim', g.easy && 'bez diakritiky', g.hint != null && 's nápovědou'].filter(Boolean).join(' · ');
+  if (marks) { ctx.fillStyle = v('--muted'); ctx.font = `700 28px ${v('--body')}`; ctx.fillText(marks, S - 120, 262); }
+  // grid
+  const tile = 96, gap = 14, gw = 5 * tile + 4 * gap, x0 = (S - gw) / 2, rows = g.results.length;
+  const gh = rows * tile + (rows - 1) * gap, y0 = 310 + (620 - gh) / 2;
+  const col = { hit: v('--hit'), near: v('--near'), miss: v('--miss') };
+  g.results.forEach((res, r) => res.forEach((x, i) => { ctx.fillStyle = col[x]; rr(ctx, x0 + i * (tile + gap), y0 + r * (tile + gap), tile, tile, 16); ctx.fill(); }));
+  ctx.textAlign = 'center'; ctx.fillStyle = v('--muted'); ctx.font = `700 30px ${v('--body')}`;
+  ctx.fillText('prejzajda-max.github.io/Slovicko', S / 2, S - 110);
+  return cv;
+}
+async function showImage() {
+  const cv = await drawResult(), url = cv.toDataURL('image/png');
+  const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+  const mobile = matchMedia('(pointer: coarse)').matches;
+  openSheet(`<h2>Obrázek výsledku</h2><img class="imgprev" src="${url}" alt="Obrázek s výsledkem hry, bez prozrazení slova">
+    <div class="row-btns"><button class="primary" id="imgSend">${mobile ? 'Sdílet' : 'Zkopírovat'}</button><a class="secondary dl" id="imgDl" href="${url}" download="slovicko-${game.kind === 'daily' ? 'c' + (game.day + 1) : game.kind}.png">Stáhnout</a></div>
+    <button class="link" id="closeBtn">Zavřít</button>`);
+  track('sdileni-obrazku', 'Sdílení obrázku');
   on('closeBtn', closeSheet);
+  on('imgSend', async () => {
+    const file = new File([blob], 'slovicko.png', { type: 'image/png' });
+    if (mobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); toast('Obrázek zkopírován, vlož ho do zprávy pomocí Ctrl+V'); }
+    catch { toast('Kopírování obrázku tu nejde, použij Stáhnout'); }
+  });
 }
 function showArchive() {
   const today = todayIndex();
@@ -886,14 +986,41 @@ function renderSide() {
       <div><b>${stats.played}</b><span>Her</span></div><div><b>${pct}%</b><span>Výher</span></div>
       <div><b>${stats.streak}</b><span>Série</span></div><div><b>${stats.best}</b><span>Nejlepší</span></div>
     </div>
-    ${dailyOver ? meaningBlock(game.answer) + '<button class="primary" id="sideShare">Sdílet dnešní výsledek</button>' : ''}
+    ${dailyOver ? meaningBlock(game.answer) + '<div class="row-btns"><button class="primary" id="sideShare">Sdílet výsledek</button><button class="secondary" id="sideImg">Obrázek</button></div>' : ''}
     <div class="legend">
       <div><span class="tile hit">K</span> správné místo</div>
       <div><span class="tile near">O</span> ve slově, ale jinde</div>
       <div><span class="tile miss">Z</span> ve slově není</div>
     </div>
     <button class="secondary" id="sideChal">Poslat výzvu kamarádovi</button>`;
-  on('sideShare', share); on('sideChal', showMakeChallenge);
+  on('sideShare', share); on('sideImg', showImage); on('sideChal', showMakeChallenge);
+  renderLeft();
+}
+const ICON = {
+  go: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+  del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM18 9l-6 6M12 9l6 6"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>'
+};
+function renderLeft() {
+  const el = document.getElementById('sideLeft'); if (!el) return;
+  const g = game;
+  if (!g.over) {
+    el.innerHTML = `<button class="bigbtn go" id="leftEnter">${ICON.go}Hádat</button>
+      <button class="bigbtn del" id="leftDel">${ICON.del}Smazat</button>
+      <p class="kbhint">Na klávesnici počítače funguje i Enter a Backspace.</p>`;
+    document.getElementById('leftEnter').onclick = e => { press('ENTER'); e.currentTarget.blur(); };
+    document.getElementById('leftDel').onclick = e => { press('⌫'); e.currentTarget.blur(); };
+    return;
+  }
+  const opts = {
+    daily:     [['Zahrát trénink', () => startGame('train')], ['Archiv slovíček', showArchive], ['Poslat výzvu', showMakeChallenge]],
+    archive:   [['Další z archivu', showArchive], ['Dnešní slovo', () => startGame('daily', todayIndex())], ['Zahrát trénink', () => startGame('train')]],
+    train:     [['Další slovo', () => startGame('train')], ['Dnešní slovo', () => startGame('daily', todayIndex())], ['Archiv slovíček', showArchive]],
+    challenge: [['Vlastní výzva', showMakeChallenge], ['Dnešní slovo', () => startGame('daily', todayIndex())], ['Zahrát trénink', () => startGame('train')]]
+  }[g.kind];
+  el.innerHTML = `<p class="lefthead">${g.won ? 'Hotovo, výborně!' : 'Tentokrát ne.'} Co dál?</p>` +
+    opts.map((o, i) => `<button class="bigbtn ${i ? 'del' : 'go'}" data-i="${i}">${i ? '' : ICON.play}${o[0]}</button>`).join('');
+  el.querySelectorAll('.bigbtn').forEach(b => b.onclick = () => { closeSheet(); opts[+b.dataset.i][1](); });
 }
 setInterval(() => {
   const el = document.getElementById('sideCd'); if (!el) return;
@@ -901,13 +1028,11 @@ setInterval(() => {
 }, 1000);
 wideMq.addEventListener ? wideMq.addEventListener('change', renderSide) : wideMq.addListener(renderSide);
 
-document.getElementById('leftEnter').onclick = e => { press('ENTER'); e.currentTarget.blur(); };
-document.getElementById('leftDel').onclick = e => { press('⌫'); e.currentTarget.blur(); };
 document.getElementById('tabDaily').onclick = () => startGame('daily', todayIndex());
 document.getElementById('tabTrain').onclick = () => startGame('train');
 document.getElementById('tabChal').onclick = showMakeChallenge;
 window.addEventListener('hashchange', () => { const c = challengeFromHash(); if (c) { closeSheet(); startGame('challenge', 0, c); } });
-document.getElementById('statsBtn').onclick = () => (game.kind === 'daily' && game.over) ? showEnd() : showStats();
+document.getElementById('statsBtn').onclick = showStats;
 document.getElementById('helpBtn').onclick = showHelp;
 document.getElementById('archBtn').onclick = showArchive;
 document.getElementById('setBtn').onclick = showSettings;
